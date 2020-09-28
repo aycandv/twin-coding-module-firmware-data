@@ -49,17 +49,17 @@ def detect_port():
 
 def upload_firmware():
     if os.name == "posix":
+        os.system("./arduino-cli core update-index")
         os.system("./arduino-cli core install arduino:avr")
         os.system("./arduino-cli lib update-index")
         os.system('./arduino-cli lib install "Servo"')
-        os.system("./arduino-cli core update-index")
         process = os.system("./arduino-cli upload --port " + str(detect_port()) + " --fqbn arduino:avr:leonardo TwinArduinoFirmware/ > /dev/null 2>&1")
     elif os.name == "nt":
+        os.system("arduino-cli core update-index")
         os.system("arduino-cli core install arduino:avr")
         os.system("arduino-cli lib update-index")
         os.system('arduino-cli lib install "Servo"')
-        os.system("arduino-cli core update-index")
-        process = os.system("arduino-cli upload --port " + str(detect_port()) + " --fqbn arduino:avr:leonardo ./TwinArduinoFirmware/")
+        process = os.system("arduino-cli upload --port " + str(detect_port()) + " --fqbn arduino:avr:leonardo TwinArduinoFirmware/")
     if process == 0:
         print("Software is successfully updated")
     else:
