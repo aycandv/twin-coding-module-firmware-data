@@ -29,21 +29,28 @@ def check_github_repo_updates():
 
 def check_for_updates():
     if check_network_conection() is True:
-        print("Connection established")
+        print("Internet Connection is established")
         check_github_repo_updates()
     else:
         print("Offline mode")
 
 def detect_port():
     ports = list(port_list.comports())
-    for p in ports:
-        if "Arduino Leonardo" in p:
-            port_name = str(p).split(" ")
-            return port_name[0]
+    if os.name == "nt":
+        for p in ports:
+            if "USB" in str(p):
+                return p.device
+    elif os.name == "posix":
+        for p in ports:
+            if "Arduino Leonardo" in str(p):
+                return p.device
     raise IOError("Twin Coding Module is not found...")
 
 def upload_firmware():
-    process = os.system("./arduino-cli upload --port " + str(detect_port()) + " --fqbn arduino:avr:leonardo TwinArduinoFirmware/TwinArduinoFirmware.ino > /dev/null 2>&1")
+    if os.name == "posix":
+        process = os.system("./arduino-cli upload --port " + str(detect_port()) + " --fqbn arduino:avr:leonardo TwinArduinoFirmware/TwinArduinoFirmware.ino > /dev/null 2>&1")
+    elif os.name == "nt":
+        process = os.system("arduino-cli.exe upload --port " + str(detect_port()) + " --fqbn arduino:avr:leonardo TwinArduinoFirmware/TwinArduinoFirmware.ino")
     if process == 0:
         print("Software update is successful")
     else:
@@ -53,5 +60,4 @@ def upload_firmware():
 
 if __name__ == "__main__":
     #check_for_updates()
-    #upload_firmware()
-    print(os.name)
+    upload_firmware()
