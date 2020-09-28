@@ -1,8 +1,8 @@
 import serial.tools.list_ports as port_list     # first, pip install pyserial
 import os
 import time
-import requests
-from update_check import isUpToDate, update
+import requests                                 # pip install requests
+from update_check import isUpToDate, update     # pip install update-check
 
 
 def check_network_conection():
@@ -48,14 +48,17 @@ def detect_port():
     raise IOError("Twin Coding Module is not found...")
 
 def upload_firmware():
-    os.system("arduino-cli core install arduino:avr")
-    os.system("arduino-cli lib update-index")
-    os.system('arduino-cli lib install "Servo"')
-    os.system("arduino-cli core update-index")
-
     if os.name == "posix":
+        os.system("./arduino-cli core install arduino:avr")
+        os.system("./arduino-cli lib update-index")
+        os.system('./arduino-cli lib install "Servo"')
+        os.system("./arduino-cli core update-index")
         process = os.system("./arduino-cli upload --port " + str(detect_port()) + " --fqbn arduino:avr:leonardo TwinArduinoFirmware/ > /dev/null 2>&1")
     elif os.name == "nt":
+        os.system("arduino-cli core install arduino:avr")
+        os.system("arduino-cli lib update-index")
+        os.system('arduino-cli lib install "Servo"')
+        os.system("arduino-cli core update-index")
         process = os.system("arduino-cli upload --port " + str(detect_port()) + " --fqbn arduino:avr:leonardo ./TwinArduinoFirmware/")
     if process == 0:
         print("Software is successfully updated")
