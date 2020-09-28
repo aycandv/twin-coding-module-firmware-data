@@ -1,5 +1,6 @@
 import serial.tools.list_ports as port_list     # first, pip install pyserial
 import os
+import time
 import requests
 from update_check import isUpToDate, update
 
@@ -38,7 +39,7 @@ def detect_port():
     ports = list(port_list.comports())
     if os.name == "nt":
         for p in ports:
-            if "USB" in str(p):
+            if "USB" in str(p) or "Arduino Leonardo":
                 return p.device
     elif os.name == "posix":
         for p in ports:
@@ -47,17 +48,22 @@ def detect_port():
     raise IOError("Twin Coding Module is not found...")
 
 def upload_firmware():
+    os.system("arduino-cli core install arduino:avr")
+    os.system("arduino-cli lib update-index")
+    os.system('arduino-cli lib install "Servo"')
+    os.system("arduino-cli core update-index")
+
     if os.name == "posix":
-        process = os.system("./arduino-cli upload --port " + str(detect_port()) + " --fqbn arduino:avr:leonardo TwinArduinoFirmware/TwinArduinoFirmware.ino > /dev/null 2>&1")
+        process = os.system("./arduino-cli upload --port " + str(detect_port()) + " --fqbn arduino:avr:leonardo TwinArduinoFirmware/ > /dev/null 2>&1")
     elif os.name == "nt":
-        process = os.system("arduino-cli.exe upload --port " + str(detect_port()) + " --fqbn arduino:avr:leonardo TwinArduinoFirmware/TwinArduinoFirmware.ino")
+        process = os.system("arduino-cli upload --port " + str(detect_port()) + " --fqbn arduino:avr:leonardo ./TwinArduinoFirmware/")
     if process == 0:
-        print("Software update is successful")
+        print("Software is successfully updated")
     else:
         print("Software update is failed")
     return process
 
 
 if __name__ == "__main__":
-    #check_for_updates()
+    check_for_updates()
     upload_firmware()
