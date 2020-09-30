@@ -39,7 +39,8 @@ def detect_port():
     ports = list(port_list.comports())
     if os.name == "nt":
         for p in ports:
-            if "USB" in str(p) or "Arduino Leonardo":
+            print(p)
+            if "USB" in str(p) or "Arduino Leonardo" in str(p):
                 return p.device
     elif os.name == "posix":
         for p in ports:
@@ -47,26 +48,33 @@ def detect_port():
                 return p.device
     raise IOError("Twin Coding Module is not found...")
 
+def cli_setup():
+    if os.name == "posix":
+        os.system("./arduino-cli core install arduino:avr")
+        os.system("./arduino-cli core update-index")
+        os.system('./arduino-cli lib install "Servo"')
+        os.system("./arduino-cli lib update-index")
+    elif os.name == "nt":
+        os.system("arduino-cli core install arduino:avr")
+        os.system("arduino-cli core update-index")
+        os.system('arduino-cli lib install "Servo"')
+        os.system("arduino-cli lib update-index")
+        os.system("arduino-cli compile --fqbn arduino:avr:leonardo TwinArduinoFirmware/")
+
+
 def upload_firmware():
     if os.name == "posix":
-        os.system("./arduino-cli core update-index")
-        os.system("./arduino-cli core install arduino:avr")
-        os.system("./arduino-cli lib update-index")
-        os.system('./arduino-cli lib install "Servo"')
-        process = os.system("./arduino-cli upload --port " + str(detect_port()) + " --fqbn arduino:avr:leonardo TwinArduinoFirmware/ > /dev/null 2>&1")
+        process = os.system("./arduino-cli upload --port " + str(detect_port()) + " -i TwinArduinoFirmware.ino.hex --fqbn arduino:avr:leonardo > /dev/null 2>&1")
     elif os.name == "nt":
-        os.system("arduino-cli core update-index")
-        os.system("arduino-cli core install arduino:avr")
-        os.system("arduino-cli lib update-index")
-        os.system('arduino-cli lib install "Servo"')
-        process = os.system("arduino-cli upload --port " + str(detect_port()) + " --fqbn arduino:avr:leonardo TwinArduinoFirmware/")
+        process = os.system("arduino-cli upload --port " + str(detect_port()) + " -i TwinArduinoFirmware.ino.hex --fqbn arduino:avr:leonardo")
     if process == 0:
-        print("Software is successfully updated")
+        print("Success")
     else:
-        print("Software update is failed")
-    return process
+        print("Failed")
 
 
 if __name__ == "__main__":
-    check_for_updates()
+    print(detect_port()[-1])
+    #check_for_updates()
+    #cli_setup()
     upload_firmware()
