@@ -18,23 +18,13 @@ def check_github_repo_updates():
     username = "aycandv/"
     repo = "twin-coding-module-firmware-data/master/"
     dir_ino = "TwinArduinoFirmware/"
-    dir_output = "TwinArduinoFirmware/build/arduino.avr.leonardo/"
 
-    files_ino = [i for i in os.listdir(dir_ino) if i.endswith(".ino")]
-    files_output = [i for i in os.listdir(dir_output) if i.endswith(".hex")]
-
-    for i in files_ino:
-        if isUpToDate(dir_ino + i, "https://raw.github.com/"+ username + repo + dir_ino + i) == False:
-            print("====>", i,"is not up to date")
-            update(dir_ino + i, "https://raw.github.com/"+ username + repo + dir_ino + i)
-            print("====>", i, "is updated")
-        else:
-            print("====>", i,"is up to date")
+    files_output = [i for i in os.listdir() if i.endswith(".hex")]
 
     for i in files_output:
-        if isUpToDate(dir_output + i, "https://raw.github.com/"+ username + repo + dir_output + i) == False:
+        if isUpToDate(i, "https://raw.github.com/"+ username + repo + i) == False:
             print("====>", i,"is not up to date")
-            update(dir_output + i, "https://raw.github.com/"+ username + repo + dir_output + i)
+            update(i, "https://raw.github.com/"+ username + repo + i)
             print("====>", i, "is updated")
         else:
             print("====>", i,"is up to date")
@@ -61,6 +51,7 @@ def detect_port():
                 return p.device
     raise IOError("Twin Coding Module is not found...")
 
+
 def cli_setup():
     if os.name == "posix":
         os.system("./arduino-cli core install arduino:avr")
@@ -86,7 +77,9 @@ def upload_firmware():
 
 
 if __name__ == "__main__":
-    print(detect_port()[-1])
-    #check_for_updates()
-    #cli_setup()
+    # These two lines below, run while loading app screen
+    check_for_updates()
+    cli_setup()
+    # After clicking Upload Button, below line of code runs. For Windows, users should push reset button once
+    # after clicking "Upload" button. There is nothing to do for macOS.
     upload_firmware()
