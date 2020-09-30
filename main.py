@@ -13,20 +13,32 @@ def check_network_conection():
         print("There is no Internet connection...")
     return False
 
+
 def check_github_repo_updates():
-    username = "aycandv"
-    repo = "/twin-coding-module-firmware-data/master/"
-    _dir = "TwinArduinoFirmware/"
+    username = "aycandv/"
+    repo = "twin-coding-module-firmware-data/master/"
+    dir_ino = "TwinArduinoFirmware/"
+    dir_output = "TwinArduinoFirmware/build/arduino.avr.leonardo/"
 
-    files = [i for i in os.listdir("TwinArduinoFirmware") if i.endswith(".ino")]
+    files_ino = [i for i in os.listdir(dir_ino) if i.endswith(".ino")]
+    files_output = [i for i in os.listdir(dir_output) if i.endswith(".hex")]
 
-    for i in files:
-        if isUpToDate(_dir + i, "https://raw.githubusercontent.com/"+ username + repo + _dir + i) == False:
+    for i in files_ino:
+        if isUpToDate(dir_ino + i, "https://raw.github.com/"+ username + repo + dir_ino + i) == False:
             print("====>", i,"is not up to date")
-            update(_dir + i, "https://raw.githubusercontent.com/"+ username + repo + _dir + i)
+            update(dir_ino + i, "https://raw.github.com/"+ username + repo + dir_ino + i)
             print("====>", i, "is updated")
         else:
             print("====>", i,"is up to date")
+
+    for i in files_output:
+        if isUpToDate(dir_output + i, "https://raw.github.com/"+ username + repo + dir_output + i) == False:
+            print("====>", i,"is not up to date")
+            update(dir_output + i, "https://raw.github.com/"+ username + repo + dir_output + i)
+            print("====>", i, "is updated")
+        else:
+            print("====>", i,"is up to date")
+
 
 def check_for_updates():
     if check_network_conection() is True:
@@ -34,6 +46,7 @@ def check_for_updates():
         check_github_repo_updates()
     else:
         print("Offline mode")
+
 
 def detect_port():
     ports = list(port_list.comports())
