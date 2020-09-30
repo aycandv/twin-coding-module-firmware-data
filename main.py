@@ -72,7 +72,6 @@ def cli_setup():
         os.system("arduino-cli core update-index")
         os.system('arduino-cli lib install "Servo"')
         os.system("arduino-cli lib update-index")
-        os.system("arduino-cli compile --fqbn arduino:avr:leonardo TwinArduinoFirmware/")
 
 
 def upload_firmware():
